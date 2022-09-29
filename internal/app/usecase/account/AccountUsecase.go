@@ -4,6 +4,7 @@ import (
 	"context"
 	"math"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/pembajak/personal-finance/internal/app/models"
 	"github.com/pembajak/personal-finance/internal/app/repository"
 	"github.com/pembajak/personal-finance/internal/pkg/token"
@@ -12,20 +13,28 @@ import (
 
 // srv ...
 type srv struct {
-	repo  *repository.Repositories
-	token token.IToken
+	repo      *repository.Repositories
+	token     token.IToken
+	validator *validator.Validate
 }
 
 // NewSrv ..
 func NewAccountCase(repo *repository.Repositories, token token.IToken) AccountUseCase {
 	return &srv{
-		repo:  repo,
-		token: token,
+		repo:      repo,
+		token:     token,
+		validator: validator.New(),
 	}
 }
 
 // CreateAccount ...
 func (s srv) CreateAccount(ctx context.Context, param models.Account) (returnData models.Account, err error) {
+
+	err = s.validator.Struct(param)
+	if err != nil {
+		return
+	}
+
 	accountRepo := models.Account{}
 	_ = deepcopier.Copy(param).To(&accountRepo)
 
@@ -41,8 +50,17 @@ func (s srv) CreateAccount(ctx context.Context, param models.Account) (returnDat
 
 // UpdateAccount ...
 func (s srv) UpdateAccount(ctx context.Context, param models.Account) (returnData models.Account, err error) {
+	accountParam := models.AccountReq{}
+	_ = deepcopier.Copy(param).To(&accountParam)
+
+	err = s.validator.Struct(accountParam)
+	if err != nil {
+		return
+	}
+
 	accountRepo := models.Account{}
 	_ = deepcopier.Copy(param).To(&accountRepo)
+
 	res, err := s.repo.Account.UpdateAccount(ctx, accountRepo)
 	if err != nil {
 		return

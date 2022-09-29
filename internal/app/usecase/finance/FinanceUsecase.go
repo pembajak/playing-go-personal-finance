@@ -4,23 +4,35 @@ import (
 	"context"
 	"math"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/pembajak/personal-finance/internal/app/models"
 	"github.com/pembajak/personal-finance/internal/app/repository"
 	"github.com/ulule/deepcopier"
 )
 
 type srv struct {
-	repo *repository.Repositories
+	repo      *repository.Repositories
+	validator *validator.Validate
 }
 
 func NewFinanceUsecase(repo *repository.Repositories) FinanceUseCase {
 	return &srv{
-		repo: repo,
+		repo:      repo,
+		validator: validator.New(),
 	}
 }
 
 // CreateFinance ...
 func (s *srv) CreateFinance(ctx context.Context, param models.Finance) (returnData models.Finance, err error) {
+
+	financeParam := models.FinanceReq{}
+	_ = deepcopier.Copy(param).To(&financeParam)
+
+	err = s.validator.Struct(financeParam)
+	if err != nil {
+		return
+	}
+
 	financeRepo := models.Finance{}
 	_ = deepcopier.Copy(param).To(&financeRepo)
 
@@ -40,6 +52,15 @@ func (s *srv) CreateFinance(ctx context.Context, param models.Finance) (returnDa
 
 // UpdateFinance ...
 func (s *srv) UpdateFinance(ctx context.Context, param models.Finance) (returnData models.Finance, err error) {
+
+	financeParam := models.FinanceReq{}
+	_ = deepcopier.Copy(param).To(&financeParam)
+
+	err = s.validator.Struct(financeParam)
+	if err != nil {
+		return
+	}
+
 	financeRepo := models.Finance{}
 	_ = deepcopier.Copy(param).To(&financeRepo)
 

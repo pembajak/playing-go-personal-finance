@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/pembajak/personal-finance/internal/app/models"
 	"github.com/pembajak/personal-finance/internal/app/repository"
 	pkgError "github.com/pembajak/personal-finance/internal/pkg/errors"
@@ -15,21 +16,29 @@ import (
 
 // srv ...
 type srv struct {
-	repo  *repository.Repositories
-	token token.IToken
+	repo      *repository.Repositories
+	token     token.IToken
+	validator *validator.Validate
 }
 
 // NewSrv ..
 func NewUsrCase(repo *repository.Repositories, token token.IToken) UserUseCase {
 	return &srv{
-		repo:  repo,
-		token: token,
+		repo:      repo,
+		token:     token,
+		validator: validator.New(),
 	}
 }
 
 // CreateUser ...
 func (s *srv) CreateUser(ctx context.Context, param models.User) (returnData models.User, err error) {
 	userRepo := models.User{}
+
+	err = s.validator.Struct(param)
+
+	if err != nil {
+		return
+	}
 
 	// encrypt password
 	password, err := utils.EncryptString(param.Password)
