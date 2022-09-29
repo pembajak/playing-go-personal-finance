@@ -5,6 +5,7 @@
 -   [How to configure on your local machine](#how-to-configure-on-your-local-machine)
 -   [How to run migration](#how-to-run-migration)
 -   [How to run on your local machine](#how-to-run-on-your-local-machine)
+-   [Api Documentation](#api-documentation)
 
 
 ## Requirement
@@ -68,3 +69,6 @@ This migration can do these actions:
     $ go run main.go
     ```    
 
+## Api Documentation
+
+[api documentation here](https://kirsb.stoplight.io/docs/personal-finance)
