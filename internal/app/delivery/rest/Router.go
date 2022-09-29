@@ -41,6 +41,13 @@ func (s *server) Router(delivery Delivery) (w httppkg.Router) {
 			router.Action(httppkg.NewRest(http.MethodDelete, "/{id}", delivery.FinanceDelivery().DeleteFinanceByID))
 		})
 
+		router.Route("/report", func(r chi.Router) {
+			router := r.(httppkg.Router)
+			router.Use(middleware.JWTAuthorization)
+			router.Action(httppkg.NewRest(http.MethodGet, "/daily", delivery.ReportDelivery().GetTotalTransactionDaily))
+			router.Action(httppkg.NewRest(http.MethodGet, "/monthly", delivery.ReportDelivery().GetTotalTransactionMonthly))
+		})
+
 	})
 	return
 }
