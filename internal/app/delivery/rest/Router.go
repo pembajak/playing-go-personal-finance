@@ -22,6 +22,16 @@ func (s *server) Router(delivery Delivery) (w httppkg.Router) {
 			router.Action(httppkg.NewRest(http.MethodGet, "/profile", delivery.UserDelivery().Profile))
 		})
 
+		router.Route("/account", func(r chi.Router) {
+			router := r.(httppkg.Router)
+			router.Use(middleware.JWTAuthorization)
+			router.Action(httppkg.NewRest(http.MethodPost, "/", delivery.AccountDelivery().CreateAccount))
+			router.Action(httppkg.NewRest(http.MethodPatch, "/{id}", delivery.AccountDelivery().UpdateAccount))
+			router.Action(httppkg.NewRest(http.MethodGet, "/", delivery.AccountDelivery().GetAllAccount))
+			router.Action(httppkg.NewRest(http.MethodGet, "/{id}", delivery.AccountDelivery().GetByAccountByID))
+			router.Action(httppkg.NewRest(http.MethodDelete, "/{id}", delivery.AccountDelivery().DeleteAccount))
+		})
+
 	})
 	return
 }
