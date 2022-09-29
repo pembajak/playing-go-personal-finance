@@ -25,9 +25,9 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	// rootCmd.AddCommand(migrateUpCmd)
-	// rootCmd.AddCommand(migrateDownCmd)
-	// rootCmd.AddCommand(makeMigrationCmd)
+	rootCmd.AddCommand(migrateUpCmd)
+	rootCmd.AddCommand(migrateDownCmd)
+	rootCmd.AddCommand(makeMigrationCmd)
 	cobra.OnInitialize(initConfig)
 
 	// Here you will define your flags and configuration settings.
@@ -64,4 +64,39 @@ func Execute() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+var migrateUpCmd = &cobra.Command{
+	Use:   "migrate:up",
+	Short: "Migrate up migration file",
+	Long:  `Migrate up migration file on folder migration/sql`,
+	Run: func(cmd *cobra.Command, args []string) {
+		mgr := WiringMigration()
+		if err := mgr.Up(); err != nil {
+			fmt.Printf("Migrate up error: %v\n", err.Error())
+		}
+	},
+}
+
+var migrateDownCmd = &cobra.Command{
+	Use:   "migrate:down",
+	Short: "Migrate down migration file",
+	Long:  `Migrate down migration file on folder migration/sql`,
+	Run: func(cmd *cobra.Command, args []string) {
+		mgr := WiringMigration()
+		if err := mgr.Down(); err != nil {
+			fmt.Printf("Migrate down error: %s", err.Error())
+		}
+	},
+}
+
+var makeMigrationCmd = &cobra.Command{
+	Use:   "make:migration [name] [ext]",
+	Short: "Make migration file",
+	Long:  `Make migration file on folder migration/sql`,
+	Args:  cobra.MinimumNArgs(2),
+	Run: func(cmd *cobra.Command, args []string) {
+		mgr := WiringMigration()
+		_ = mgr.Create(args[0], args[1])
+	},
 }

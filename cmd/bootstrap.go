@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/pembajak/personal-finance/cmd/migration"
 	"github.com/pembajak/personal-finance/config"
 	"github.com/pembajak/personal-finance/internal/app"
 	"github.com/pembajak/personal-finance/internal/app/appcontext"
@@ -54,4 +55,15 @@ func RunRest() {
 
 	logger.Println("Server stopped")
 
+}
+
+func WiringMigration() (mgr migration.IMigration) {
+	appContext := appcontext.NewAppContext()
+	db, err := appContext.GetDB()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	mgr = migration.New(db)
+	return
 }
