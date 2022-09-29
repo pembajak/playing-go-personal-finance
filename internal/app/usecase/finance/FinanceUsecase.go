@@ -23,12 +23,17 @@ func (s *srv) CreateFinance(ctx context.Context, param models.Finance) (returnDa
 	financeRepo := models.Finance{}
 	_ = deepcopier.Copy(param).To(&financeRepo)
 
-	res, err := s.repo.Finance.CreateFinance(ctx, financeRepo)
+	retData, err := s.repo.Finance.CreateFinance(ctx, financeRepo)
 	if err != nil {
 		return
 	}
 
-	_ = deepcopier.Copy(res).To(&returnData)
+	finance, err := s.repo.Finance.GetFinanceByID(ctx, retData.ID)
+	if err != nil {
+		return
+	}
+
+	_ = deepcopier.Copy(finance).To(&returnData)
 	return
 }
 
@@ -37,12 +42,17 @@ func (s *srv) UpdateFinance(ctx context.Context, param models.Finance) (returnDa
 	financeRepo := models.Finance{}
 	_ = deepcopier.Copy(param).To(&financeRepo)
 
-	res, err := s.repo.Finance.UpdateFinance(ctx, financeRepo)
+	_, err = s.repo.Finance.UpdateFinance(ctx, financeRepo)
 	if err != nil {
 		return
 	}
 
-	_ = deepcopier.Copy(res).To(&returnData)
+	finance, err := s.repo.Finance.GetFinanceByID(ctx, param.ID)
+	if err != nil {
+		return
+	}
+
+	_ = deepcopier.Copy(finance).To(&returnData)
 	return
 }
 
