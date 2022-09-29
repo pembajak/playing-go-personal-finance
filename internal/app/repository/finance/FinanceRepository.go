@@ -51,3 +51,23 @@ func (r *repo) GetFinanceByID(ctx context.Context, id int64) (returnData models.
 
 	return
 }
+
+// GetAllFinance ...
+func (r *repo) GetAllFinance(ctx context.Context, req models.GetAllFinanceReq) (returnData []models.Finance, err error) {
+	returnData, err = r.DB.GetAllFinance(ctx, req)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// CountTotalFinance ...
+func (r *repo) CountTotalFinance(ctx context.Context, req models.GetAllFinanceReq) (total int64, err error) {
+	total, err = r.DB.CountTotalFinance(ctx, req)
+	if err != nil {
+		return
+	}
+
+	return
+}

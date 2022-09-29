@@ -2,6 +2,7 @@ package finance
 
 import (
 	"context"
+	"math"
 
 	"github.com/pembajak/personal-finance/internal/app/models"
 	"github.com/pembajak/personal-finance/internal/app/repository"
@@ -101,5 +102,50 @@ func (s *srv) GetFinanceByID(ctx context.Context, id int64) (returnData models.F
 		UpdatedAt:       res.UpdatedAt,
 	}
 
+	return
+}
+
+// GetAllFinance ...
+func (s *srv) GetAllFinance(ctx context.Context, req models.GetAllFinanceReq) (returnData models.GetAllFinanceRes, err error) {
+	var financeRepo []models.Finance
+	var financeReq models.GetAllFinanceReq
+	_ = deepcopier.Copy(req).To(&financeReq)
+	res, err := s.repo.Finance.GetAllFinance(ctx, financeReq)
+	if err != nil {
+		return
+	}
+
+	for _, v := range res {
+		var financeTmp models.Finance
+		_ = deepcopier.Copy(v).To(&financeTmp)
+		financeTmp.Account = models.Account(v.Account)
+		financeRepo = append(financeRepo, financeTmp)
+	}
+
+	totalData, err := s.repo.Finance.CountTotalFinance(ctx, financeReq)
+	if err != nil {
+		return
+	}
+
+	if len(financeRepo) == 0 {
+		financeRepo = []models.Finance{}
+	}
+
+	returnData.Data = financeRepo
+	returnData.Total = totalData
+	returnData.Page = 1
+	returnData.Limit = 10
+
+	if req != (models.GetAllFinanceReq{}) {
+		if req.Limit != 0 {
+			returnData.Limit = req.Limit
+		}
+
+		if req.Page != 0 {
+			returnData.Page = req.Page
+		}
+
+		returnData.LastPage = int(math.Ceil(float64(returnData.Total) / float64(returnData.Limit)))
+	}
 	return
 }

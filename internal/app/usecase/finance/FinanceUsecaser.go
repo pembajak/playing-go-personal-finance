@@ -11,4 +11,5 @@ type FinanceUseCase interface {
 	UpdateFinance(ctx context.Context, finance models.Finance) (returnData models.Finance, err error)
 	DeleteFinanceByID(ctx context.Context, id int64) (returnData models.Finance, err error)
 	GetFinanceByID(ctx context.Context, id int64) (returnData models.Finance, err error)
+	GetAllFinance(ctx context.Context, req models.GetAllFinanceReq) (returnData models.GetAllFinanceRes, err error)
 }

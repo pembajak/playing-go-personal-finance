@@ -18,6 +18,7 @@ type FinanceDeliverer interface {
 	DeleteFinanceByID(w http.ResponseWriter, r *http.Request) (returnData interface{}, err error)
 	UpdateFinance(w http.ResponseWriter, r *http.Request) (returnData interface{}, err error)
 	GetFinanceByID(w http.ResponseWriter, r *http.Request) (returnData interface{}, err error)
+	GetAllFinance(w http.ResponseWriter, r *http.Request) (returnData interface{}, err error)
 }
 
 type delivery struct {
@@ -94,6 +95,29 @@ func (d *delivery) DeleteFinanceByID(w http.ResponseWriter, r *http.Request) (re
 	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	returnData, err = d.usecase.Finance.DeleteFinanceByID(ctx, id)
 
+	w.Header().Add("Content-Type", "application/json")
+
+	return
+}
+
+// GetAllFinance ...
+func (d *delivery) GetAllFinance(w http.ResponseWriter, r *http.Request) (returnData interface{}, err error) {
+	ctx := r.Context()
+	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
+	userID := r.Context().Value("claims").(jwt.MapClaims)["ID"].(float64)
+
+	request := models.GetAllFinanceReq{
+		Page:      page,
+		Limit:     limit,
+		UserID:    int64(userID),
+		Title:     r.URL.Query().Get("title"),
+		StartDate: r.URL.Query().Get("start_date"),
+		EndDate:   r.URL.Query().Get("end_date"),
+		Type:      r.URL.Query().Get("type"),
+	}
+
+	returnData, err = d.usecase.Finance.GetAllFinance(ctx, request)
 	w.Header().Add("Content-Type", "application/json")
 
 	return

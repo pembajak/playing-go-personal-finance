@@ -36,6 +36,7 @@ func (s *server) Router(delivery Delivery) (w httppkg.Router) {
 			router := r.(httppkg.Router)
 			router.Use(middleware.JWTAuthorization)
 			router.Action(httppkg.NewRest(http.MethodPost, "/", delivery.FinanceDelivery().CreateFinance))
+			router.Action(httppkg.NewRest(http.MethodGet, "/", delivery.FinanceDelivery().GetAllFinance))
 			router.Action(httppkg.NewRest(http.MethodPatch, "/{id}", delivery.FinanceDelivery().UpdateFinance))
 			router.Action(httppkg.NewRest(http.MethodGet, "/{id}", delivery.FinanceDelivery().GetFinanceByID))
 			router.Action(httppkg.NewRest(http.MethodDelete, "/{id}", delivery.FinanceDelivery().DeleteFinanceByID))
